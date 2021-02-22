@@ -125,6 +125,16 @@ class TargetColumnsBlock(TargetBlock[ColumnTarget], Generic[ColumnTarget]):
 
 @dataclass
 class TestBlock(TargetColumnsBlock[Testable], Generic[Testable]):
+    typetag = "TestBlock"
+
+    @classmethod
+    def typetags():
+        try:
+            super_type_tags = super().typetags()
+            return [typetag] + super_type_tags
+        except:
+            return [typetag]
+
     @property
     def tests(self) -> List[TestDef]:
         if self.target.tests is None:

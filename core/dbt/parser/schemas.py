@@ -852,9 +852,15 @@ class NonSourceParser(YamlDocsReader, Generic[NonSourceTarget, Parsed]):
             # node_block is a TargetBlock (Macro or Analysis)
             # or a TestBlock (all of the others)
             node_block = self.get_block(node)
-            if isinstance(node_block, TestBlock):
-                # TestablePatchParser = models, seeds, snapshots
-                test_blocks.append(node_block)
+            # attempt to use typetags
+            try:
+                if "TestBlock" in node_block.typetags():
+                    test_blocks.append(node_block)
+            # if the value has no typetags fall back to the much slower isinstance function
+            except:
+                if isinstance(node_block, TestBlock):
+                    # TestablePatchParser = models, seeds, snapshots
+                    test_blocks.append(node_block)
             if isinstance(node, (HasColumnDocs, HasColumnTests)):
                 # UnparsedNodeUpdate and UnparsedAnalysisUpdate
                 refs: ParserRef = ParserRef.from_target(node)
